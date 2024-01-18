@@ -1,4 +1,5 @@
 const { default: puppeteer } = require("puppeteer");
+require("dotenv").config();
 
 const scrapeLogic = async (res, league) => {
 	const NBA_SCOREBOARD = "https://www.espn.com/nba/scoreboard";
@@ -6,7 +7,14 @@ const scrapeLogic = async (res, league) => {
 	const NFL_SCOREBOARD =
 		"https://www.espn.com/nfl/scoreboard/_/week/1/year/2023/seasontype/3";
 
-	const browser = await puppeteer.launch({ headless: "new" });
+	const browser = await puppeteer.launch({
+		headless: "new",
+		args: ["--no-sandbox", "--disable-setuid-sandbox"],
+		executablePath:
+			process.env.NODE_ENV === "production"
+				? process.env.PUPPETEER_EXECUTABLE_PATH
+				: puppeteer.executablePath(),
+	});
 
 	try {
 		const page = await browser.newPage();
