@@ -11,6 +11,7 @@ export const GET: RequestHandler = async ({ params }) => {
 
 	if (params.league === 'nfl') await page.goto(NFL_SCOREBOARD);
 	else if (params.league === 'nba') await page.goto(NBA_SCOREBOARD);
+	else error(404, 'Not found');
 
 	const games = await page.evaluate(() => {
 		const gameCard = document.querySelectorAll('section.gameModules');
@@ -56,10 +57,6 @@ export const GET: RequestHandler = async ({ params }) => {
 		}
 	});
 
-	console.log(games);
-
 	browser.close();
-	return new Response(JSON.stringify(games));
-
-	error(404, 'Not found');
+	return new Response(JSON.stringify(games?.games || []));
 };
