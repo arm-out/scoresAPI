@@ -2,6 +2,7 @@ import { error, type RequestHandler } from '@sveltejs/kit';
 
 const date = new Date().toISOString().split('T')[0];
 const BASKETBALL = `https://api.sofascore.com/api/v1/sport/basketball/scheduled-events/${date}`;
+const FOOTBALL = `https://api.sofascore.com/api/v1/sport/american-football/scheduled-events/${date}`
 
 export const GET: RequestHandler = async ({ fetch, params }) => {
     const options = {
@@ -25,13 +26,18 @@ export const GET: RequestHandler = async ({ fetch, params }) => {
         }
     };
 
-    const res = await fetch(BASKETBALL, options);
+    const res = params.league === 'NBA' ? await fetch(BASKETBALL, options) : await fetch(FOOTBALL, options);
     const games = await res.json();
 
-    let nba = games.events.filter((game: any) => game.tournament.name === 'NBA');
-    nba = nba.filter((game: any) => new Date(parseInt(game.startTimestamp) * 1000).toLocaleDateString() === new Date().toLocaleDateString());
+    let filtered = games.events.filter((game: any) => game.tournament.uniqueTournament.name === params.league);
+    let today = filtered.filter((game: any) => new Date(parseInt(game.startTimestamp) * 1000).toLocaleDateString() === new Date().toLocaleDateString());
+
+    // Show previous day games if no games today
+    if (today.length == 0) {
+        today = filtered
+    }
     
-    let apiRes = nba.map((game: any) => ({
+    let apiRes = today.map((game: any) => ({
         home: game.homeTeam.shortName,
         away: game.awayTeam.shortName,
         startTime: game.startTimestamp,
@@ -39,7 +45,7 @@ export const GET: RequestHandler = async ({ fetch, params }) => {
         statusDesc: game.status.description,
         homeScore: game.homeScore.current ? game.homeScore.current : 0,
         awayScore: game.awayScore.current ? game.awayScore.current : 0,
-        period: game.lastPeriod ? game.lastPeriod : 0,
+        period: game.lastPeriod ? game.lastPeriod : "",
         periodLength: game.time.periodLength ? game.time.periodLength : 0,
         overtimeLength: game.time.overtimeLength ? game.time.overtimeLength : 0,
         timePlayed: game.time.played ? game.time.played : 0,
