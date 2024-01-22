@@ -31,7 +31,6 @@ export const GET: RequestHandler = async ({ fetch, params }) => {
 
     let filtered = games.events.filter((game: any) => game.tournament.uniqueTournament.name === params.league);
     let today = filtered.filter((game: any) => new Date(parseInt(game.startTimestamp) * 1000).toLocaleDateString() === new Date().toLocaleDateString());
-    console.log(new Date().toLocaleDateString())
 
     // Show previous day games if no games today
     if (today.length == 0) {
@@ -39,6 +38,7 @@ export const GET: RequestHandler = async ({ fetch, params }) => {
     }
     
     let apiRes = filtered.map((game: any) => ({
+        date: new Date().toLocaleDateString(),
         home: game.homeTeam.shortName,
         away: game.awayTeam.shortName,
         startTime: game.startTimestamp,
