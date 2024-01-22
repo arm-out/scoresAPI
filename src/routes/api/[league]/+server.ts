@@ -37,7 +37,7 @@ export const GET: RequestHandler = async ({ fetch, params }) => {
         today = filtered
     }
     
-    let apiRes = filtered.map((game: any) => ({
+    let apiRes = today.map((game: any) => ({
         date: new Date().toLocaleDateString(),
         home: game.homeTeam.shortName,
         away: game.awayTeam.shortName,
