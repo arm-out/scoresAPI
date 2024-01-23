@@ -38,8 +38,8 @@ export const GET: RequestHandler = async ({ fetch, params }) => {
     }
     
     let apiRes = filtered.map((game: any) => ({
-        date: new Date(parseInt(game.startTimestamp) * 1000).toLocaleDateString('en-US'),
-        today: new Date().toLocaleDateString('en-US'), 
+        date: new Date(parseInt(game.startTimestamp) * 1000).toLocaleDateString('en-US', { timeZone: 'America/New_York'}),
+        today: new Date().toLocaleDateString('en-US', { timeZone: 'America/New_York'}), 
         home: game.homeTeam.shortName,
         away: game.awayTeam.shortName,
         startTime: game.startTimestamp,
