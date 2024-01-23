@@ -30,16 +30,14 @@ export const GET: RequestHandler = async ({ fetch, params }) => {
     const games = await res.json();
 
     let filtered = games.events.filter((game: any) => game.tournament.uniqueTournament.name === params.league);
-    let today = filtered.filter((game: any) => new Date(parseInt(game.startTimestamp) * 1000).toLocaleDateString('en-US') === new Date().toLocaleDateString('en-US'));
+    let today = filtered.filter((game: any) => new Date(parseInt(game.startTimestamp) * 1000).toLocaleDateString('en-US', { timeZone: 'America/New_York'}) === new Date().toLocaleDateString('en-US', { timeZone: 'America/New_York'}));
 
     // Show previous day games if no games today
     if (today.length == 0) {
         today = filtered
     }
     
-    let apiRes = filtered.map((game: any) => ({
-        date: new Date(parseInt(game.startTimestamp) * 1000).toLocaleDateString('en-US', { timeZone: 'America/New_York'}),
-        today: new Date().toLocaleDateString('en-US', { timeZone: 'America/New_York'}), 
+    let apiRes = today.map((game: any) => ({
         home: game.homeTeam.shortName,
         away: game.awayTeam.shortName,
         startTime: game.startTimestamp,
